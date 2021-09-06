@@ -38,27 +38,23 @@
 PKG = 'rospy_tutorials'
 NAME = 'talker_listener_test'
 
-import sys, unittest, time
 
-import rospy, rostest
-from std_msgs.msg import *
+import rospy
+from std_msgs.msg import String
 
-class TestTalkerListener(unittest.TestCase):
-    def __init__(self, *args):
-        super(TestTalkerListener, self).__init__(*args)
-        self.success = False
+class TestTalkerListener():
+
+    success = False
         
     def callback(self, data):
-        print(rospy.get_caller_id(), "I heard %s"%data.data)
+        rospy.loginfo("{} I heard {}".format(rospy.get_caller_id(), data.data))
         self.success = data.data and data.data.startswith('hello world')
 
     def test_talker_listener(self):
         rospy.init_node(NAME, anonymous=True)
-        rospy.Subscriber("chatter", String, self.callback)
-        timeout_t = time.time() + 10.0 #10 seconds
-        while not rospy.is_shutdown() and not self.success and time.time() < timeout_t:
-            time.sleep(0.1)
-        self.assert_(self.success)
-        
-if __name__ == '__main__':
-    rostest.rosrun(PKG, NAME, TestTalkerListener, sys.argv)
+        rospy.Subscriber("/chatter", String, self.callback)
+        timeout_t = rospy.get_time() + 10.0  # 10 seconds
+        rate = rospy.Rate(10)  # 10hz
+        while not rospy.is_shutdown() and not self.success and rospy.get_time() < timeout_t:
+            rate.sleep()
+        assert (self.success)

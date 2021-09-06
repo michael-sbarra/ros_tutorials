@@ -1,8 +1,7 @@
 <launch>
 
   <node name="talker" pkg="rospy_tutorials" type="talker_timer.py" />
-
-  <test test-name="talker_listener_test_with_timer"
-        pkg="rospy_tutorials" type="talker_listener_test.py" />
+  <param name="test_module" value="$(find rospy_tutorials)/test/talker_listener_test.py"/>
+  <test test-name="test_talker_listener_with_timer" pkg="ros_pytest" type="ros_pytest_runner" />
 
 </launch>

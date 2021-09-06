@@ -37,18 +37,22 @@
 import rospy
 from std_msgs.msg import String
 
+class talker_timer():
+    def __init__(self):
+        self.pub = rospy.Publisher('/chatter', String, queue_size=10)
+    def publish_callback(self, event):
+        hello_str = "hello world {0}".format(event.current_real.to_sec())
+        rospy.loginfo(hello_str)
+        self.pub.publish(hello_str)
 
-def publish_callback(event):
-    hello_str = "hello world %s" % event.current_real.to_sec()
-    rospy.loginfo(hello_str)
-    pub.publish(hello_str)
-
+def main():
+    rospy.init_node('talker', anonymous=True)
+    my_talker_timer = talker_timer()
+    timer = rospy.Timer(rospy.Duration(1. / 10), my_talker_timer.publish_callback)  # 10Hz
+    rospy.spin()
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('talker', anonymous=True)
-        pub = rospy.Publisher('chatter', String, queue_size=10)
-        timer = rospy.Timer(rospy.Duration(1. / 10), publish_callback)  # 10Hz
-        rospy.spin()
+        main()
     except rospy.ROSInterruptException:
         pass
