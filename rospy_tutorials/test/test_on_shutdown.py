@@ -34,39 +34,30 @@
 # Revision $Id: test_peer_subscribe_notify.py 3803 2009-02-11 02:04:39Z rob_wheeler $
 
 ## Integration test for peer_subscribe_notify
-from __future__ import print_function
 
 PKG = 'rospy_tutorials'
 NAME = 'peer_subscribe_notify_test'
 
-import sys 
-import time
-import unittest
 
 import rospy
-import rostest
-import roslib.scriptutil as scriptutil
 from std_msgs.msg import String
 
 
-class TestOnShutdown(unittest.TestCase):
-    def __init__(self, *args):
-        super(TestOnShutdown, self).__init__(*args)
-        self.success = False
+class TestOnShutdown():
+
+    success = False
         
     def callback(self, data):
-        print(rospy.get_caller_id(), "I heard %s" % data.data)
-        #greetings is only sent over peer_publish callback, so hearing it is a success condition
+        rospy.loginfo("{0} I heard {1}".format(rospy.get_caller_id(), data.data))
+        # greetings is only sent over peer_publish callback, so hearing it is a success condition
         if "I'm dead" in data.data:
             self.success = True
 
     def test_notify(self):
-        rospy.Subscriber("chatter", String, self.callback)
         rospy.init_node(NAME, anonymous=True)
-        timeout_t = time.time() + 10.0*1000 #10 seconds
-        while not rospy.is_shutdown() and not self.success and time.time() < timeout_t:
-            time.sleep(0.1)
-        self.assert_(self.success, str(self.success))
-        
-if __name__ == '__main__':
-    rostest.rosrun(PKG, NAME, TestOnShutdown, sys.argv)
+        rospy.Subscriber("/chatter", String, self.callback)
+        timeout_t = rospy.get_time() + 10.0  # 10 seconds
+        rate = rospy.Rate(10)  # 10hz
+        while not rospy.is_shutdown() and not self.success and rospy.get_time() < timeout_t:
+            rate.sleep()
+        assert (self.success)

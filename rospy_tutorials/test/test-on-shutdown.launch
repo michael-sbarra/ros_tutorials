@@ -1,4 +1,5 @@
 <launch>
   <node name="pos_node" pkg="rospy_tutorials" type="publish_on_shutdown_test_node.py" />
-  <test test-name="on_shutdown" pkg="rospy_tutorials" type="test_on_shutdown.py" />
+  <param name="test_module" value="$(find rospy_tutorials)/test/test_on_shutdown.py"/>
+  <test test-name="on_shutdown" pkg="ros_pytest" type="ros_pytest_runner" />
 </launch>
