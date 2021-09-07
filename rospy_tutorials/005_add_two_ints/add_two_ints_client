@@ -36,13 +36,12 @@
 ## Simple demo of a rospy service client that calls a service to add
 ## two integers. 
 
-import sys
-import os
+NAME = 'add_two_ints_client'
 
 import rospy
 
 # imports the AddTwoInts service 
-from rospy_tutorials.srv import *
+from rospy_tutorials.srv import AddTwoInts, AddTwoIntsRequest
 
 ## add two numbers using the add_two_ints service
 ## @param x int: first number to add
@@ -61,7 +60,7 @@ def add_two_ints_client(x, y):
         # create a handle to the add_two_ints service
         add_two_ints = rospy.ServiceProxy('add_two_ints', AddTwoInts)
         
-        print("Requesting %s+%s"%(x, y))
+        rospy.loginfo("Requesting {0}+{1}".format(x, y))
         
         # simplified style
         resp1 = add_two_ints(x, y)
@@ -70,31 +69,22 @@ def add_two_ints_client(x, y):
         resp2 = add_two_ints.call(AddTwoIntsRequest(x, y))
 
         if not resp1.sum == (x + y):
-            raise Exception("test failure, returned sum was %s"%resp1.sum)
+            raise Exception("test failure, returned sum was {0}".format(resp1.sum))
         if not resp2.sum == (x + y):
-            raise Exception("test failure, returned sum was %s"%resp2.sum)
+            raise Exception("test failure, returned sum was {0}".format(resp2.sum))
         return resp1.sum
     except rospy.ServiceException, e:
-        print("Service call failed: %s"%e)
+        rospy.logerr("Service call failed: {0}".format(e))
 
-def usage():
-    return "%s [x y]"%sys.argv[0]
+# def usage():
+#     return "{0} [x y]".format(sys.argv[0])
 
 if __name__ == "__main__":
-    
-    argv = rospy.myargv()
-    if len(argv) == 1:
+
+    rospy.init_node(NAME)
+    args = rospy.get_param('~')
+    if args.pop('random'):
         import random
-        x = random.randint(-50000, 50000)
-        y = random.randint(-50000, 50000)
-    elif len(argv) == 3:
-        try:
-            x = int(argv[1])
-            y = int(argv[2])
-        except:
-            print(usage())
-            sys.exit(1)
-    else:
-        print(usage())
-        sys.exit(1)
-    print("%s + %s = %s"%(x, y, add_two_ints_client(x, y)))
+        args['x'] = random.randint(-50000,50000)
+        args['y'] = random.randint(-50000,50000)
+    rospy.loginfo("{0} + {1} = {2}".format(args['x'], args['y'], add_two_ints_client(**args)))

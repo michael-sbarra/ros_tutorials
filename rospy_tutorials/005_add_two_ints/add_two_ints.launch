@@ -1,0 +1,11 @@
+<launch>
+  <arg name="x" default="1" doc="1st int to add"/>
+  <arg name="y" default="2" doc="2nd int to add"/>
+  <arg name="random" default="False" doc="randomize x and y"/>
+  <node name="a2i_server" pkg="rospy_tutorials" type="add_two_ints_server" output="screen" />
+  <node name="a2i_client" pkg="rospy_tutorials" type="add_two_ints_client" output="screen" >
+    <param name="x" type="int" value="$(arg x)" />
+    <param name="y" type="int" value="$(arg y)" />
+    <param name="random" type="bool" value="$(arg random)" />
+  </node>
+</launch>

@@ -35,69 +35,72 @@
 
 ## Integration test for add_two_ints 
 
-from __future__ import print_function
-
 PKG = 'rospy_tutorials'
 NAME = 'add_two_ints_test'
 
 import sys
-import unittest
 
 import rospy
-import rostest
-from rospy_tutorials.srv import *
+import pytest
+from rospy_tutorials.srv import AddTwoInts, AddTwoIntsRequest, BadTwoInts, BadTwoIntsRequest
 
-class TestAddTwoInts(unittest.TestCase):
-        
-    def test_add_two_ints(self):
-        rospy.wait_for_service('add_two_ints')
-        s = rospy.ServiceProxy('add_two_ints', AddTwoInts)
-        tests = [(1, 2), (0, 0), (-1, -2), (12312, 980123), (sys.maxsize, -sys.maxsize), (sys.maxsize, -1), (sys.maxsize, 0)]
-        for x, y in tests:
-            print("Requesting %s+%s" % (x, y))
-            # test both simple and formal call syntax
-            resp = s(x, y)
-            resp2 = s.call(AddTwoIntsRequest(x, y))
-            self.assertEquals(resp.sum,resp2.sum)
-            print("%s+%s = %s" % (x, y, resp.sum))
-            self.assertEquals(resp.sum,(x + y), "integration failure, returned sum was %s vs. %s"%(resp.sum, (x+y)))
+class TestAddTwoInts():
 
-    def test_add_two_ints_bad_then_good(self):
+    @pytest.fixture(scope="class", autouse=True)
+    def start_node(self):
+        rospy.init_node(NAME, anonymous=True)
+
+    @pytest.fixture(scope="class")
+    def s_add_two_ints(self):
         rospy.wait_for_service('add_two_ints')
+        yield rospy.ServiceProxy('add_two_ints', AddTwoInts)
+
+    @pytest.fixture(scope="class")
+    def s_bad_two_ints(self):
+        rospy.wait_for_service('add_two_ints')
+        yield rospy.ServiceProxy('add_two_ints', BadTwoInts)
+
+    @pytest.fixture(params=[(1, 2), (0, 0), (-1, -2), (12312, 980123), (sys.maxsize, -sys.maxsize), (sys.maxsize, -1), (sys.maxsize, 0)])
+    def vals(self, request):
+        yield request.param
+
+    def test_add_two_ints(self, s_add_two_ints, vals):
+        x, y = vals
+        rospy.loginfo("Requesting {0}+{1}".format(x, y))
+        # test both simple and formal call syntax
+        resp = s_add_two_ints(x, y)
+        resp2 = s_add_two_ints.call(AddTwoIntsRequest(x, y))
+        assert resp.sum == resp2.sum
+        rospy.loginfo("{0}+{1} = {2}".format(x, y, resp.sum))
+        total = x + y
+        assert resp.sum == total, "integration failure, returned sum was {0} vs. {1}".format(resp.sum, total)
+
+    def test_add_two_ints_bad_then_good(self, s_bad_two_ints, s_add_two_ints):
         try:
-            s = rospy.ServiceProxy('add_two_ints', BadTwoInts)            
-            resp = s(1, 2)
-            self.fail("service call should have failed with exception but instead returned 1+2=%s"%resp.sum)
+            resp = s_bad_two_ints(1, 2)
+            assert False, "service call should have failed with exception but instead returned 1+2={0}".format(resp.sum)
         except rospy.ServiceException as e:
-            print("success -- ros exception was thrown: %s" % e)
-        s = rospy.ServiceProxy('add_two_ints', AddTwoInts)
-        resp = s.call(AddTwoIntsRequest(1, 2))
-        self.assertEquals(3,resp.sum)
-        
-            
-    def test_add_two_ints_bad_type(self):
-        rospy.wait_for_service('add_two_ints')
-        s = rospy.ServiceProxy('add_two_ints', BadTwoInts)
-        tests = [(1, 2), (0, 0), (-1, -2), (12312, 980123), (sys.maxsize, -sys.maxsize), (sys.maxsize, -1), (sys.maxsize, 0)]
-        for x, y in tests:
-            print("Requesting %s+%s" % (x, y))
-            # test both simple and formal call syntax
-            try:
-                resp = s(x, y)
-                if resp.sum == x+y:
-                    self.fail("call 1 with bad type failed: the server appears to be incorrectly deserialing the packet as it returned: %s"%resp.sum)
-                else:
-                    self.fail("call 1 with bad type failed to throw exception: %s"%resp.sum)
-            except rospy.ServiceException as e:
-                print("success -- ros exception was thrown: %s" % e)
-            try:
-                resp = s.call(BadTwoIntsRequest(x, y))
-                if resp.sum == x+y:
-                    self.fail("call 2 with bad type failed: the server appears to be incorrectly deserialing the packet as it returned: %s"%resp.sum)
-                else:
-                    self.fail("call 2 with bad type failed to throw exception: %s"%resp.sum)
-            except rospy.ServiceException as e:
-                print("success -- ros exception was thrown: %s" % e)
-        
-if __name__ == '__main__':
-    rostest.rosrun(PKG, NAME, TestAddTwoInts, sys.argv)
+            rospy.loginfo("success -- ros exception was thrown: {0}".format(e))
+        resp = s_add_two_ints.call(AddTwoIntsRequest(1, 2))
+        assert 3 == resp.sum
+
+    def test_add_two_ints_bad_type(self, s_bad_two_ints, vals):
+        x, y = vals
+        rospy.loginfo("Requesting {0}+{1}".format(x, y))
+        # test both simple and formal call syntax
+        try:
+            resp = s_bad_two_ints(x, y)
+            if resp.sum == x+y:
+                assert False, "call 1 with bad type failed: the server appears to be incorrectly deserialing the packet as it returned: {0}".format(resp.sum)
+            else:
+                assert False, "call 1 with bad type failed to throw exception: {0}".format(resp.sum)
+        except rospy.ServiceException as e:
+            rospy.loginfo("success -- ros exception was thrown: {0}".format(e))
+        try:
+            resp = s_bad_two_ints.call(BadTwoIntsRequest(x, y))
+            if resp.sum == x+y:
+                assert False, "call 2 with bad type failed: the server appears to be incorrectly deserialing the packet as it returned: {0}".format(resp.sum)
+            else:
+                assert False, "call 2 with bad type failed to throw exception: {0}".format(resp.sum)
+        except rospy.ServiceException as e:
+            rospy.loginfo("success -- ros exception was thrown: {0}".format(e))
