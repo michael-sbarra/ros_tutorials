@@ -45,7 +45,7 @@ from std_msgs.msg import String
 class TestTalkerListener():
 
     success = False
-        
+
     def callback(self, data):
         rospy.loginfo("{} I heard {}".format(rospy.get_caller_id(), data.data))
         self.success = data.data and data.data.startswith('hello world')

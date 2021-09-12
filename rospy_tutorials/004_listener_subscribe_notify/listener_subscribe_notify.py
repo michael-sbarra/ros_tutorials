@@ -44,32 +44,34 @@ from std_msgs.msg import String
 
 class ChatterListener(rospy.SubscribeListener):
     def peer_subscribe(self, topic_name, topic_publish, peer_publish):
-        print("a peer subscribed to topic [%s]" % topic_name)
+        rospy.loginfo("a peer subscribed to topic [{0}]".format(topic_name))
         
-        str = "Hey everyone, we have a new friend!"
-        print(str)
-        topic_publish(String(str))
-        str = "greetings. welcome to topic "+topic_name
-        print(str)
-        peer_publish(String(str))
+        subscriber_str = "Hey everyone, we have a new friend!"
+        rospy.loginfo(subscriber_str)
+        topic_publish(String(subscriber_str))
+        greeting_str = "greetings. welcome to topic {0}".format(topic_name)
+        rospy.loginfo(greeting_str)
+        peer_publish(String(greeting_str))
         
     def peer_unsubscribe(self, topic_name, numPeers):
-        print("a peer unsubscribed from topic [%s]" % topic_name)
+        rospy.loginfo("a peer unsubscribed from topic [{0}]".format(topic_name))
         if numPeers == 0:
-            print("I have no friends")
+            rospy.loginfo("I have no friends")
     
 def talker_callback():
-    pub = rospy.Publisher("chatter", String, subscriber_listener=ChatterListener(), queue_size=10)
     rospy.init_node(NAME, anonymous=True)
+    pub = rospy.Publisher("chatter", String, subscriber_listener=ChatterListener(), queue_size=10)
     count = 0
+    rate = rospy.Rate(10)  # 10hz
     while not rospy.is_shutdown():
-        str = "hello world %d"%count
-        print(str)
-        pub.publish(String(str))
+        hello_str = "hello world {0}".format(count)
+        rospy.loginfo(hello_str)
+        pub.publish(String(hello_str))
         count += 1
-        rospy.sleep(0.1)
+        rate.sleep()
         
 if __name__ == '__main__':
     try:
         talker_callback()
-    except rospy.ROSInterruptException: pass
+    except rospy.ROSInterruptException:
+        pass

@@ -1,4 +1,5 @@
 <launch>
   <node name="listener" pkg="rospy_tutorials" type="listener_subscribe_notify.py" />
-  <test test-name="listener_subscribe_notify" pkg="rospy_tutorials" type="test_peer_subscribe_notify.py" />
+  <param name="test_module" value="$(find rospy_tutorials)/test/test_peer_subscribe_notify.py" />
+  <test test-name="listener_subscribe_notify" pkg="ros_pytest" type="ros_pytest_runner" />
 </launch>
