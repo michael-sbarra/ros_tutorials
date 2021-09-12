@@ -41,26 +41,26 @@ NAME = 'listener_with_user_data'
 import sys
 
 import rospy
-from std_msgs.msg import *
+from std_msgs.msg import String
 
 def callback(data, args):
     if args == 1:
-        print("#1: I heard [%s]"%data.data)
+        rospy.loginfo("#1: I heard [{0}]".format(data.data))
     elif args == 2:
-        print("#2: I heard [%s]"%data.data)
+        rospy.loginfo("#2: I heard [{0}]".format(data.data))
     else:
-        print("I heard [%s] with userdata [%s]"%(data.data, str(args)))
+        rospy.loginfo("I heard [{0}] with userdata [{1}]".format(data.data, args))
     
 def listener_with_user_data():
     # Callback arguments (aka user data) allow you to reuse the same
     # callback for different topics, or they can even allow you to use
     # the same callback for the same topic, but have it do something
     # different based on the arguments.
+    rospy.init_node(NAME, anonymous=True)
     rospy.Subscriber("chatter", String, callback, 1)
     rospy.Subscriber("chatter", String, callback, 2)
     rospy.Subscriber("chatter", String, callback, ("chatter1", 4))    
     rospy.Subscriber("chatter2", String, callback, "This is from chatter2")
-    rospy.init_node(NAME, anonymous=True)
     rospy.spin()
         
 if __name__ == '__main__':
