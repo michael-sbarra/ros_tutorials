@@ -47,11 +47,11 @@ def callback(data):
     chatter = data.data
     header = data.header
     timestamp = header.stamp.to_sec()
-    print(rospy.get_caller_id(), header.seq, "I just heard that %s at %12f"%(chatter, timestamp))
+    rospy.loginfo("{0} {1} I just heard that {2} at {3:12f}".format(rospy.get_caller_id(), header.seq, chatter, timestamp))
     
 def listener_header():
-    rospy.Subscriber("chatter_header", HeaderString, callback)
     rospy.init_node(NAME, anonymous=True)
+    rospy.Subscriber("/chatter_header", HeaderString, callback)
     rospy.spin()
         
 if __name__ == '__main__':

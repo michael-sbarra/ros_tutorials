@@ -36,27 +36,34 @@
 ## talker_header publishes HeaderString messages to the 'chatter_header'
 ## topic.
 
-import sys
 
 import rospy
 from rospy_tutorials.msg import HeaderString
 
 NAME = 'talker_header'
 
-def talker_header():
-    pub = rospy.Publisher("chatter_header", HeaderString, queue_size=10)
-
-    rospy.init_node(NAME) #blocks until registered with master
-    count = 0
-    while not rospy.is_shutdown():
-        str = 'hello world %s'%count
-        print(str)
+class talker_header():
+    def __init__(self):
+        self.pub = rospy.Publisher("/chatter_header", HeaderString, queue_size=10)
+    def publish(self, message):
         # If None is used as the header value, rospy will automatically
         # fill it in.
-        pub.publish(HeaderString(None, str))
+        self.pub.publish(HeaderString(None, message))
+
+def main():
+    rospy.init_node(NAME)  # blocks until registered with master
+    my_talker_header = talker_header()
+    rate = rospy.Rate(10)  # 10hz
+    count = 0
+    while not rospy.is_shutdown():
+        hello_str = 'hello world {0}'.format(count)
+        rospy.loginfo(hello_str)
+        my_talker_header.publish(hello_str)
         count += 1
-        rospy.sleep(0.1)
+        rate.sleep()
     
 if __name__ == '__main__':
-    talker_header()
-
+    try:
+        main()
+    except rospy.ROSInterruptException:
+        pass
