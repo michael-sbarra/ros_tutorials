@@ -36,7 +36,7 @@
 ## Extended version of add_two_int_client that shows how to use
 ## connection header to pass in metadata to service.
 
-import sys
+NAME = 'client_connection_header'
 
 import rospy
 
@@ -54,34 +54,26 @@ def add_two_ints_client(x, y):
         metadata = { 'cookies' : 'peanut butter' } 
         add_two_ints = rospy.ServiceProxy('add_two_ints', AddTwoInts, headers=metadata)
         
-        print("Requesting %s+%s with cookies=%s"%(x, y, metadata['cookies']))
+        rospy.loginfo("Requesting {0}+{1} with cookies={2}".format(x, y, metadata['cookies']))
         
         # simplified style
         resp = add_two_ints(x, y)
-        print("Server's connection headers were", resp._connection_header)
+        rospy.loginfo("Server's connection headers were {0}", resp._connection_header)
 
         return resp.sum
-    except rospy.ServiceException, e:
-        print("Service call failed: %s"%e)
-
-def usage():
-    return "%s [x y]"%sys.argv[0]
+    except rospy.ServiceException as e:
+        rospy.logerr("Service call failed: {0}".format(e))
 
 if __name__ == "__main__":
     
-    if len(sys.argv) == 1:
+    rospy.init_node(NAME)
+    args = rospy.get_param('~')
+    if 'x' not in args:
+        args['x'] = 1
+    if 'y' not in args:
+        args['y'] = 2
+    if args.pop('random'):
         import random
-        x = random.randint(-50000, 50000)
-        y = random.randint(-50000, 50000)
-    elif len(sys.argv) == 3:
-        try:
-            import string
-            x = string.atoi(sys.argv[1])
-            y = string.atoi(sys.argv[2])
-        except:
-            print(usage())
-            sys.exit(1)
-    else:
-        print(usage())
-        sys.exit(1)
-    print("%s + %s = %s"%(x, y, add_two_ints_client(x, y)))
+        args['x'] = random.randint(-50000,50000)
+        args['y'] = random.randint(-50000,50000)
+    rospy.loginfo("{0} + {1} = {2}".format(args['x'], args['y'], add_two_ints_client(**args)))

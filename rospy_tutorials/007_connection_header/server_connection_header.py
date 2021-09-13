@@ -39,14 +39,14 @@
 NAME = 'add_two_ints_server'
 
 # import the AddTwoInts service
-from rospy_tutorials.srv import *
+from rospy_tutorials.srv import AddTwoInts, AddTwoIntsResponse
 import rospy 
 
 def add_two_ints(req):
-    print("Request from %s"%req._connection_header['callerid'])
+    rospy.loginfo("Request from {0}".format(req._connection_header['callerid']))
     if 'cookies' in req._connection_header:
-        print("Request gave me %s cookies"%req._connection_header['cookies'])
-    print("Returning [%s + %s = %s]"%(req.a, req.b, (req.a + req.b)))
+        rospy.loginfo("Request gave me {0} cookies".format(req._connection_header['cookies']))
+    rospy.loginfo("Returning [{0} + {1} = {2}]".format(req.a, req.b, (req.a + req.b)))
     return AddTwoIntsResponse(req.a + req.b)
 
 def add_two_ints_server():

@@ -36,49 +36,47 @@
 ## Extended version of add_two_int_client that shows how to use
 ## connection header to pass in metadata to service.
 
-from __future__ import print_function
 
 PKG = 'rospy_tutorials'
 NAME = 'test_client_connection_header'
 
 import sys
-import unittest
 
 from rospy_tutorials.srv import AddTwoInts
 import rospy
-import rostest
+import pytest
 
 
-class TestClientConnectionHeader(unittest.TestCase):
-    def __init__(self, *args):
-        super(TestClientConnectionHeader, self).__init__(*args)
-        self.success = False
-        
-    def test_header(self):
+class TestClientConnectionHeader():
+
+    success = False
+
+    def test_client_connection_header(self):
+        rospy.init_node(NAME, anonymous=True)
         import random
         x = random.randint(0, 1000)
-        y = random.randint(0, 1000)            
+        y = random.randint(0, 1000)
+        service_name = '/add_two_ints'
+        rospy.wait_for_service(service_name)
 
-        rospy.wait_for_service('add_two_ints')
-    
         try:
             # initialize ServiceProxy with extra header information.
             # header is only exchanged on initial connection
-            metadata = { 'cookies' : 'peanut butter' } 
-            add_two_ints = rospy.ServiceProxy('add_two_ints', AddTwoInts, headers=metadata)
+            metadata = { 'cookies' : 'peanut butter' }
+            add_two_ints = rospy.ServiceProxy(service_name, AddTwoInts, headers=metadata)
 
-            print("Requesting %s+%s with cookies=%s" % (x, y, metadata['cookies']))
-        
+            rospy.loginfo("Requesting {0}+{1} with cookies={2}".format(x, y, metadata['cookies']))
+
             # simplified style
             resp = add_two_ints(x, y)
-            print("Server's connection headers were", resp._connection_header)
-            self.assert_('callerid' in resp._connection_header)
+            rospy.loginfo("Server's connection headers were {0}".format(resp._connection_header))
+            assert 'callerid' in resp._connection_header
 
             return resp.sum
         except rospy.ServiceException as e:
-            print("Service call failed: %s" % e)
-            raise #fail
-        
+            rospy.logerr("Service call failed: {0}".format(e))
+            assert False
+
 if __name__ == '__main__':
     if '--node' in sys.argv:
         # run as a normal node instead (test of server_connection_header)
@@ -86,16 +84,14 @@ if __name__ == '__main__':
         rospy.init_node('sch_test_client', anonymous=True)
         # NOTE different service name
         service_name = 'add_two_ints_header_test'
-        rospy.wait_for_service(service_name)
-        metadata = { 'cookies' : 'peanut butter' } 
-        add_two_ints = rospy.ServiceProxy(service_name, AddTwoInts, headers=metadata)
         try:
+            rospy.wait_for_service(service_name)
+            metadata = { 'cookies' : 'peanut butter' }
+            add_two_ints = rospy.ServiceProxy(service_name, AddTwoInts, headers=metadata)
+            rate = rospy.Rate(10)  # 10hz
             while not rospy.is_shutdown():
                 resp = add_two_ints(1, 2)
                 # call at 10hz until test is over
-                rospy.sleep(0.1)
-        except rospy.ServiceException as e:
-            pass # happens when test is over
-    else:
-        rostest.rosrun(PKG, NAME, TestClientConnectionHeader, sys.argv)
-
+                rate.sleep()
+        except rospy.ROSInterruptException:
+            pass

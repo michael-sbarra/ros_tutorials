@@ -41,33 +41,25 @@ from __future__ import print_function
 PKG = 'rospy_tutorials'
 NAME = 'test_server_connection_header'
 
-import sys
-import time
-import unittest
-
 from rospy_tutorials.srv import AddTwoInts, AddTwoIntsResponse
 import rospy
-import rostest
+import pytest
 
-class TestServerConnectionHeader(unittest.TestCase):
-    def __init__(self, *args):
-        super(TestServerConnectionHeader, self).__init__(*args)
-        self.success = False
-        rospy.init_node(NAME, anonymous=True)
-        s = rospy.Service('add_two_ints_header_test', AddTwoInts, self.handle_request)        
-        
+class TestServerConnectionHeader():
+
+    success = False
+
     def handle_request(self, req):
         if 'cookies' in req._connection_header:
-            print("GOT", req._connection_header['cookies'])
+            rospy.loginfo("GOT {0}".format(req._connection_header['cookies']))
             self.success = req._connection_header['cookies'] == 'peanut butter'
         return AddTwoIntsResponse(3)
 
     def test_header(self):
-        timeout_t = time.time() + 10.0*1000 #10 seconds
-        while not rospy.is_shutdown() and not self.success and time.time() < timeout_t:
-            time.sleep(0.1)
-        self.assert_(self.success, str(self.success))
-        
-if __name__ == '__main__':
-    rostest.rosrun(PKG, NAME, TestServerConnectionHeader, sys.argv)
-
+        rospy.init_node(NAME, anonymous=True)
+        s = rospy.Service('/add_two_ints_header_test', AddTwoInts, self.handle_request)
+        timeout_t = rospy.get_time() + 10.0  # 10 seconds
+        rate = rospy.Rate(10)  # 10hz
+        while not rospy.is_shutdown() and not self.success and rospy.get_time() < timeout_t:
+            rate.sleep()
+        assert (self.success)

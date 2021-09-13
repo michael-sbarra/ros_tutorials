@@ -48,10 +48,9 @@ import roslib.scriptutil as scriptutil
 from std_msgs.msg import String
 
 
-class TestListenerConnectionHeader(unittest.TestCase):
-    def __init__(self, *args):
-        super(TestListenerConnectionHeader, self).__init__(*args)
-        self.success = False
+class TestListenerConnectionHeader():
+
+    success = False
         
     def callback(self, data):
         chatter = data.data
@@ -60,15 +59,13 @@ class TestListenerConnectionHeader(unittest.TestCase):
             self.success = True
         else:
             who = 'unknown'
-        print("I just heard %s from %s" % (chatter, who))
+        rospy.loginfo("I just heard {0} from {1}".format(chatter, who))
 
     def test_notify(self):
-        rospy.Subscriber("chatter", String, self.callback)
         rospy.init_node(NAME, anonymous=True)
-        timeout_t = time.time() + 10.0*1000 #10 seconds
-        while not rospy.is_shutdown() and not self.success and time.time() < timeout_t:
-            time.sleep(0.1)
-        self.assert_(self.success, str(self.success))
-        
-if __name__ == '__main__':
-    rostest.rosrun(PKG, NAME, TestListenerConnectionHeader, sys.argv)
+        rospy.Subscriber("/chatter", String, self.callback)
+        timeout_t = rospy.get_time() + 10.0  # 10 seconds
+        rate = rospy.Rate(10)  # 10hz
+        while not rospy.is_shutdown() and not self.success and rospy.get_time() < timeout_t:
+            rate.sleep()
+        assert (self.success)
