@@ -39,28 +39,27 @@
 import rospy
 from std_msgs.msg import String
 
-pub = None
+class Talker():
 
-# publish a message to subscribers when we die
-def talker_shutdown():
-    rospy.loginfo("I'm dead!")
-    pub.publish("I'm dead!")
+    def __init__(self):
+        rospy.init_node('talker', anonymous=True)
+        self.pub = rospy.Publisher('/chatter', String, queue_size=10)
 
-    # need to sleep a bit to ensure that the message is sent
-    # which happens asynchonously
-    rate.sleep()
+        # register talker_shutdown() to be called when rospy exits
+        rospy.on_shutdown(self.talker_shutdown)
+        self.rate = rospy.Rate(2)  # 2hz
+        self.rate.sleep()
 
-def talker():
-    global pub, rate
-    rospy.init_node('talker', anonymous=True)
-    pub = rospy.Publisher('/chatter', String, queue_size=10)
+        rospy.signal_shutdown('test done')
 
-    # register talker_shutdown() to be called when rospy exits
-    rospy.on_shutdown(talker_shutdown)
-    rate = rospy.Rate(2)  # 2hz
-    rate.sleep()
+    # publish a message to subscribers when we die
+    def talker_shutdown(self):
+        rospy.loginfo("I'm dead!")
+        self.pub.publish("I'm dead!")
 
-    rospy.signal_shutdown('test done')
+        # need to sleep a bit to ensure that the message is sent
+        # which happens asynchonously
+        self.rate.sleep()
 
 if __name__ == '__main__':
-    talker()
+    Talker()
