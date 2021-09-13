@@ -33,14 +33,16 @@
 #
 # Revision $Id: listener.py 5263 2009-07-17 23:30:38Z sfkwc $
 
-## Simple talker demo that listens to std_msgs/Strings published 
+## Simple talker demo that listens to std_msgs/Strings published
 ## to the 'chatter' topic
+
+NAME = 'param_talker'
 
 import rospy
 from std_msgs.msg import String
 
 def param_talker():
-    rospy.init_node('param_talker')
+    rospy.init_node(NAME)
 
     # Fetch values from the Parameter Server. In this example, we fetch
     # parameters from three different namespaces:
@@ -50,25 +52,25 @@ def param_talker():
     # 3) private (/foo/param_talker/topic_name)
 
     # fetch a /global parameter
-    global_example = rospy.get_param("/global_example")
-    rospy.loginfo("%s is %s", rospy.resolve_name('/global_example'), global_example)
-    
+    global_example = rospy.get_param('/global_example')
+    rospy.loginfo("{0} is {1}".format(rospy.resolve_name('/global_example'), global_example))
+
     # fetch the utterance parameter from our parent namespace
     utterance = rospy.get_param('utterance')
-    rospy.loginfo("%s is %s", rospy.resolve_name('utterance'), utterance)
-    
+    rospy.loginfo("{0} is {1}".format(rospy.resolve_name('utterance'), utterance))
+
     # fetch topic_name from the ~private namespace
     topic_name = rospy.get_param('~topic_name')
-    rospy.loginfo("%s is %s", rospy.resolve_name('~topic_name'), topic_name)
+    rospy.loginfo("{0} is {1}".format(rospy.resolve_name('~topic_name'), topic_name))
 
     # fetch a parameter, using 'default_value' if it doesn't exist
     default_param = rospy.get_param('default_param', 'default_value')
-    rospy.loginfo('%s is %s', rospy.resolve_name('default_param'), default_param)
-    
+    rospy.loginfo("{0} is {1}".format(rospy.resolve_name('default_param'), default_param))
+
     # fetch a group (dictionary) of parameters
     gains = rospy.get_param('gains')
     p, i, d = gains['P'], gains['I'], gains['D']
-    rospy.loginfo("gains are %s, %s, %s", p, i, d)    
+    rospy.loginfo("gains are {0}, {1}, {2}".format(p, i, d))
 
     # set some parameters
     rospy.loginfo('setting parameters...')
@@ -81,23 +83,24 @@ def param_talker():
     # delete a parameter
     if rospy.has_param('to_delete'):
         rospy.delete_param('to_delete')
-        rospy.loginfo("deleted %s parameter"%rospy.resolve_name('to_delete'))
+        rospy.loginfo("deleted {0} parameter".format(rospy.resolve_name('to_delete')))
     else:
-        rospy.loginfo('parameter %s was already deleted'%rospy.resolve_name('to_delete'))
+        rospy.loginfo("parameter {0} was already deleted".format(rospy.resolve_name('to_delete')))
 
     # search for a parameter
     param_name = rospy.search_param('global_example')
-    rospy.loginfo('found global_example parameter under key: %s'%param_name)
-    
+    rospy.loginfo("found global_example parameter under key: {0}".format(param_name))
+
     # publish the value of utterance repeatedly
     pub = rospy.Publisher(topic_name, String, queue_size=10)
+    rate = rospy.Rate(10)  # 10hz
     while not rospy.is_shutdown():
         pub.publish(utterance)
         rospy.loginfo(utterance)
-        rospy.sleep(1)
-        
+        rate.sleep()
+
 if __name__ == '__main__':
     try:
         param_talker()
-    except rospy.ROSInterruptException: pass
-    
+    except rospy.ROSInterruptException:
+        pass

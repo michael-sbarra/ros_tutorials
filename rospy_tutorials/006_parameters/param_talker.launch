@@ -1,29 +1,36 @@
 <launch>
+  <arg name="global_example_str" default="global value" doc=""/>
+  <arg name="utterance_str" default="Hello World" doc="utterance string value"/>
+  <arg name="to_delete_str" default="Delete Me" doc="to_delete string value"/>
+  <arg name="topic_name" default="chatter" doc="private topic name str"/>
+  <arg name="P" default="1.0" doc="proportional val"/>
+  <arg name="I" default="2.0" doc="integrated val"/>
+  <arg name="D" default="3.0" doc="derivative val"/>
 
   <!-- set a /global_example parameter -->
-  <param name="global_example" value="global value" />
-    
+  <param name="global_example" value="$(arg global_example_str)" />
+
   <group ns="foo">
 
     <!-- set /foo/utterance -->
-    <param name="utterance" value="Hello World" />
+    <param name="utterance" value="$(arg utterance_str)" />
 
-    <param name="to_delete" value="Delete Me" />
+    <param name="to_delete" value="$(arg to_delete_str)" />
 
     <!-- a group of parameters that we will fetch together -->
     <group ns="gains">
-      <param name="P" value="1.0" />
-      <param name="I" value="2.0" />
-      <param name="D" value="3.0" />      
+      <param name="P" type="double" value="$(arg P)" />
+      <param name="I" type="double" value="$(arg I)" />
+      <param name="D" type="double" value="$(arg D)" />
     </group>
-  
+
     <node pkg="rospy_tutorials" name="param_talker" type="param_talker.py" output="screen">
-    
+
       <!-- set /foo/utterance/param_talker/topic_name -->
-      <param name="topic_name" value="chatter" />
-      
+      <param name="topic_name" type="str" value="$(arg topic_name)" />
+
     </node>
-    
+
   </group>
-  
+
 </launch>
