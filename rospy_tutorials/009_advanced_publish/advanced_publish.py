@@ -42,24 +42,26 @@ import rospy
 from std_msgs.msg import ColorRGBA
 
 def talker():
+    rospy.init_node('color_talker', anonymous=True)
     topic = 'color'
     pub = rospy.Publisher(topic, ColorRGBA, queue_size=10)
-    rospy.init_node('color_talker', anonymous=True)
-    print("\n\nNode running. To see messages, please type\n\t'rostopic echo %s'\nIn another window\n\n"%(rospy.resolve_name(topic)))
+    rospy.loginfo("Node running. To see messages, please type `rostopic echo {0}` In another window".format(rospy.resolve_name(topic)))
+    rate = rospy.Rate(2)  # 2hz
     while not rospy.is_shutdown():
 
         # publish with in-order initialization of arguments (r, g, b, a)
         pub.publish(1, 2, 3, 4)
-        rospy.sleep(.5)
+        rate.sleep()
 
         # publish with a=1, use default values for rest
         pub.publish(a=1.0)
-        rospy.sleep(.5)
+        rate.sleep()
 
         # print the number of subscribers
-        rospy.loginfo("I have %s subscribers"%pub.get_num_connections())
-        
+        rospy.loginfo("I have {0} subscribers".format(pub.get_num_connections()))
+
 if __name__ == '__main__':
     try:
         talker()
-    except rospy.ROSInterruptException: pass
+    except rospy.ROSInterruptException:
+        pass
