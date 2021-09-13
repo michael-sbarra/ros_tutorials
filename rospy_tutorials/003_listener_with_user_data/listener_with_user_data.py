@@ -50,7 +50,7 @@ def callback(data, args):
         rospy.loginfo("#2: I heard [{0}]".format(data.data))
     else:
         rospy.loginfo("I heard [{0}] with userdata [{1}]".format(data.data, args))
-    
+
 def listener_with_user_data():
     # Callback arguments (aka user data) allow you to reuse the same
     # callback for different topics, or they can even allow you to use
@@ -59,13 +59,12 @@ def listener_with_user_data():
     rospy.init_node(NAME, anonymous=True)
     rospy.Subscriber("chatter", String, callback, 1)
     rospy.Subscriber("chatter", String, callback, 2)
-    rospy.Subscriber("chatter", String, callback, ("chatter1", 4))    
+    rospy.Subscriber("chatter", String, callback, ("chatter1", 4))
     rospy.Subscriber("chatter2", String, callback, "This is from chatter2")
     rospy.spin()
-        
+
 if __name__ == '__main__':
     try:
         listener_with_user_data()
-    except KeyboardInterrupt, e:
+    except KeyboardInterrupt as e:
         pass
-    print("exiting")

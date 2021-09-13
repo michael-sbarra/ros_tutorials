@@ -47,7 +47,7 @@ class talker_shutdown():
         msg = "I'm dead!"
         rospy.loginfo(msg)
         self.pub.publish(msg)
-    
+
 def talker():
     rospy.init_node('talker', anonymous=True)
     my_talker_shutdown = talker_shutdown()
@@ -58,6 +58,6 @@ def talker():
 
     # spin() blocks until the node shuts down
     rospy.spin()
-        
+
 if __name__ == '__main__':
     talker()

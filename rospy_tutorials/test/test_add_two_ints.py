@@ -33,7 +33,7 @@
 #
 # Revision $Id$
 
-## Integration test for add_two_ints 
+## Integration test for add_two_ints
 
 PKG = 'rospy_tutorials'
 NAME = 'add_two_ints_test'

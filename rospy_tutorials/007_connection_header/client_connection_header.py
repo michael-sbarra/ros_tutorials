@@ -47,15 +47,15 @@ from rospy_tutorials.srv import AddTwoInts
 ## @param y int: second number to add
 def add_two_ints_client(x, y):
     rospy.wait_for_service('add_two_ints')
-    
+
     try:
         # initialize ServiceProxy with extra header information.
         # header is only exchanged on initial connection
-        metadata = { 'cookies' : 'peanut butter' } 
+        metadata = { 'cookies' : 'peanut butter' }
         add_two_ints = rospy.ServiceProxy('add_two_ints', AddTwoInts, headers=metadata)
-        
+
         rospy.loginfo("Requesting {0}+{1} with cookies={2}".format(x, y, metadata['cookies']))
-        
+
         # simplified style
         resp = add_two_ints(x, y)
         rospy.loginfo("Server's connection headers were {0}", resp._connection_header)
@@ -65,7 +65,7 @@ def add_two_ints_client(x, y):
         rospy.logerr("Service call failed: {0}".format(e))
 
 if __name__ == "__main__":
-    
+
     rospy.init_node(NAME)
     args = rospy.get_param('~')
     if 'x' not in args:

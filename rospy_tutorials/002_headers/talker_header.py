@@ -61,7 +61,7 @@ def main():
         my_talker_header.publish(hello_str)
         count += 1
         rate.sleep()
-    
+
 if __name__ == '__main__':
     try:
         main()

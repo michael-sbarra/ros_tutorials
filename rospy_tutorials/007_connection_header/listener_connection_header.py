@@ -52,12 +52,12 @@ def callback(data):
         rospy.loginfo("{0} just offered me {1} cookies".format(who, data._connection_header['cookies']))
     else:
         rospy.loginfo("I just heard {0} from {1}".format(chatter, who))
-    
+
 def listener_header():
     rospy.init_node(NAME, anonymous=True)
     rospy.Subscriber("/chatter", String, callback)
     rospy.spin()
-        
+
 if __name__ == '__main__':
     try:
         listener_header()

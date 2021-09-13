@@ -38,7 +38,7 @@
 PKG = 'rospy_tutorials'
 NAME = 'peer_subscribe_notify_test'
 
-import sys 
+import sys
 import time
 import unittest
 
@@ -51,7 +51,7 @@ from std_msgs.msg import String
 class TestListenerConnectionHeader():
 
     success = False
-        
+
     def callback(self, data):
         chatter = data.data
         if 'callerid' in data._connection_header:

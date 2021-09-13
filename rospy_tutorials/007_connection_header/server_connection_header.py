@@ -40,7 +40,7 @@ NAME = 'add_two_ints_server'
 
 # import the AddTwoInts service
 from rospy_tutorials.srv import AddTwoInts, AddTwoIntsResponse
-import rospy 
+import rospy
 
 def add_two_ints(req):
     rospy.loginfo("Request from {0}".format(req._connection_header['callerid']))

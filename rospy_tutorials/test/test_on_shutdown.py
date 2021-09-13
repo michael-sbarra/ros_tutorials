@@ -46,7 +46,7 @@ from std_msgs.msg import String
 class TestOnShutdown():
 
     success = False
-        
+
     def callback(self, data):
         rospy.loginfo("{0} I heard {1}".format(rospy.get_caller_id(), data.data))
         # greetings is only sent over peer_publish callback, so hearing it is a success condition

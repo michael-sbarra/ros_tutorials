@@ -39,20 +39,14 @@
 PKG = 'rospy_tutorials'
 NAME = 'peer_subscribe_notify_test'
 
-import sys 
-import time
-import unittest
-
 import rospy
-import ros_pytest
-import roslib.scriptutil as scriptutil
 from std_msgs.msg import String
 
 
 class TestPeerSubscribeListener():
 
     success = False
- 
+
     def callback(self, data):
         rospy.loginfo("{0} I heard {1}".format(rospy.get_caller_id(), data.data))
         # greetings is only sent over peer_publish callback, so hearing it is a success condition
@@ -64,6 +58,6 @@ class TestPeerSubscribeListener():
         rospy.Subscriber("/chatter", String, self.callback)
         timeout_t = rospy.get_time() + 10.0  # 10 seconds
         rate = rospy.Rate(10)  # 10hz
-        while not rospy.is_shutdown() and not self.success and time.time() < timeout_t:
+        while not rospy.is_shutdown() and not self.success and rospy.get_time() < timeout_t:
             rate.sleep()
         assert (self.success)

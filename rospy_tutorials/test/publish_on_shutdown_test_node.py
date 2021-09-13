@@ -40,28 +40,27 @@ import rospy
 from std_msgs.msg import String
 
 pub = None
+
 # publish a message to subscribers when we die
 def talker_shutdown():
-    print("I'm dead!")
+    rospy.loginfo("I'm dead!")
     pub.publish("I'm dead!")
 
     # need to sleep a bit to ensure that the message is sent
     # which happens asynchonously
-    import time
-    time.sleep(2.0)
-    
+    rate.sleep()
+
 def talker():
-    global pub
-    pub = rospy.Publisher('chatter', String, queue_size=10)
+    global pub, rate
     rospy.init_node('talker', anonymous=True)
+    pub = rospy.Publisher('/chatter', String, queue_size=10)
 
     # register talker_shutdown() to be called when rospy exits
     rospy.on_shutdown(talker_shutdown)
-    
-    import time
-    time.sleep(2.0)
+    rate = rospy.Rate(2)  # 2hz
+    rate.sleep()
 
     rospy.signal_shutdown('test done')
-        
+
 if __name__ == '__main__':
     talker()
