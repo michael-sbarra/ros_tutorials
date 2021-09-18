@@ -108,7 +108,9 @@ if(CATKIN_ENABLE_TESTING)
       test/test-talker-listener-with-roscpp.launch
       test/test-talker-listener-with-timer.launch
       test/test-on-shutdown.launch
-      test/test-connection-header.launch)
+      test/test-listener-connection-header.launch
+      test/test-client-connection-header.launch
+      test/test-server-connection-header.launch)
      add_rostest(${T})
   endforeach()
 endif()

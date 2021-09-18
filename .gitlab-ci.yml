@@ -8,7 +8,6 @@ before_script:
   - apt update >/dev/null && apt install -y git >/dev/null
   - git clone https://gitlab.com/VictorLamoine/ros_gitlab_ci.git >/dev/null
   - source ros_gitlab_ci/gitlab-ci.bash >/dev/null
-  - apt install ros-melodic-ros-pytest
 
 catkin build:
   stage: build

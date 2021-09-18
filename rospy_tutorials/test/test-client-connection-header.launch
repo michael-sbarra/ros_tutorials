@@ -1,0 +1,9 @@
+<launch>
+  <node name="talker" pkg="rospy_tutorials" type="talker.py" />
+  <node name="a2i_server" pkg="rospy_tutorials" type="add_two_ints_server" />
+  <node name="test_client_ch" pkg="rospy_tutorials" type="test_client_connection_header.py" args="--node"/>
+
+  <param name="test_module" value="$(find rospy_tutorials)/test/test_client_connection_header.py" />
+  <test test-name="client_connection_header" pkg="ros_pytest" type="ros_pytest_runner" />
+
+</launch>
