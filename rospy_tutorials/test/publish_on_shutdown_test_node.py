@@ -60,6 +60,7 @@ class Talker():
         # need to sleep a bit to ensure that the message is sent
         # which happens asynchonously
         self.rate.sleep()
+        rospy.loginfo("still alive")
 
 if __name__ == '__main__':
     Talker()

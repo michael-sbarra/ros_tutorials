@@ -23,7 +23,8 @@ catkin run_tests:
   stage: test
   script:
     - source devel/setup.bash
-    - catkin run_tests --no-status --force-color | sed -En '/^-- run_tests.py/,/^-- run_tests.py/p'
+    # - catkin run_tests --no-status --force-color | sed -En '/^-- run_tests.py/,/^-- run_tests.py/p'
+    - rostest -t rospy_tutorials test-on-shutdown.launch
     - catkin_test_results # Check if one of the tests failed!
   needs:
     - job: catkin build

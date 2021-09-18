@@ -52,6 +52,7 @@ class TestOnShutdown():
         # greetings is only sent over peer_publish callback, so hearing it is a success condition
         if "I'm dead" in data.data:
             self.success = True
+            rospy.loginfo("got it")
 
     def test_notify(self):
         rospy.init_node(NAME, anonymous=True)
