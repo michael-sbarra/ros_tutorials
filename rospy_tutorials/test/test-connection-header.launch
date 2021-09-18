@@ -7,7 +7,7 @@
     <param name="test_module" value="$(find rospy_tutorials)/test/test_listener_connection_header.py" />
   </test>
   <test test-name="client_connection_header" pkg="ros_pytest" type="ros_pytest_runner">
-    <param name="/test_module" value="$(find rospy_tutorials)/test/test_client_connection_header.py" />
+    <param name="test_module" value="$(find rospy_tutorials)/test/test_client_connection_header.py" />
   </test>
   <test test-name="server_connection_header" pkg="ros_pytest" type="ros_pytest_runner">
     <param name="test_module" value="$(find rospy_tutorials)/test/test_server_connection_header.py" />
